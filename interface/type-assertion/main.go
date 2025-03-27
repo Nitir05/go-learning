@@ -3,8 +3,46 @@ package main
 import "fmt"
 
 func getExpenseReport(e expense) (string, float64) {
-	fmt.Println(e.(email))
-	return "", 0.0
+	switch v := e.(type) {
+		case email:
+            return v.toAddress, v.cost()
+        case sms:
+            return v.toPhoneNumber, v.cost()
+        default:
+            return "", 0.0
+	}
+}
+
+type Formatter interface {
+	Format() string
+}
+
+type PlainText struct {
+	message string
+}
+
+type Bold struct {
+	message string
+}
+
+type Code struct {
+	message string
+}
+
+func (p PlainText) Format() string {
+	return p.message
+}
+
+func (b Bold) Format() string {
+	return fmt.Sprintf("**%s**", b.message);
+}
+
+func (c Code) Format() string {
+	return fmt.Sprintf("`%s`", c.message);
+}
+
+func SendMessage(formatter Formatter) string {
+	return formatter.Format() // Adjusted to call Format without an argument
 }
 
 // don't touch below this line
